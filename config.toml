@@ -1,1 +1,3 @@
-target = "/target"
+build_place = "target/"
+template_svg = "test.svg"
+change_picture = "test.png"

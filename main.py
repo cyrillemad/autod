@@ -1,10 +1,14 @@
 import base64
+import tomllib
 
 build_path = "build.svg"
 select_id = "image0_1081_1069"
 
-with open("template/autod.svg", "r") as config_file:
-    data = config_file.read()
+with open("config.toml", "rb") as cfg:
+    config = tomllib.load(cfg)
+
+with open(config['template_svg'], "r") as svg:
+    data = svg.read()
 
 
 def decompose_image(data):
@@ -73,8 +77,9 @@ def build_svg(svg, picture):
     after_image_slice = svg[data_edges[1] - 1 + move:-1]
 
     build = before_image_slice + addon + after_image_slice
-    with open("build.svg", "w") as file:
+    buildname = 'build.svg' # todo: generation of packs svg from packs input pictures
+    with open(config['build_place'] + buildname, "w") as file:
         file.write(build)
 
 
-build_svg(data, "template/test.jpeg")
+build_svg(data, config['change_picture'])

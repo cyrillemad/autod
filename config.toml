@@ -1,5 +1,7 @@
-build_place = "target"
-template_svg = "test.svg"
-change_svg_picture_id = "image0_97_20"
+[directories]
+build_dir = "target"
 pictures_dir = "template"
 
+[template]
+template_svg = "test.svg"
+template_svg_picture_id = "image0_97_20"

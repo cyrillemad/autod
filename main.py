@@ -5,11 +5,15 @@ import os
 with open("config.toml", "rb") as cfg:
     config = tomllib.load(cfg)
 
-with open(config['template_svg'], "r") as svg:
+directory_config = config['directories']
+template_config = config['template']
+
+print(config)
+with open(template_config['template_svg'], "r") as svg:
     data = svg.read()
 
-select_id = config['change_svg_picture_id']
-pictures_dir = config['pictures_dir']
+select_id = template_config['template_svg_picture_id']
+pictures_dir = directory_config['pictures_dir']
 pictures = os.listdir(pictures_dir)
 
 def decompose_image(data):
@@ -49,14 +53,6 @@ def get_property(string, property):
             edges.append(i + 1)
     return edges
 
-
-def get_data(decomposed):
-    image_pack = select_image_by_id(decomposed, select_id)
-    image, move = image_pack[0], image_pack[1]
-    edges = get_property(image, "xlink:href")
-    return decomposed[edges[0] + move:edges[1] - 1 + move]
-
-
 def template_to_base64(path):
     with open(path, "rb") as image_file:
         base64_byte = base64.b64encode(image_file.read())
@@ -72,7 +68,6 @@ def build_svg(svg, picture, bid):
 
     image_pack = select_image_by_id(decompose_image(svg), select_id)
     addon = template_to_base64(picture)
-    print(select_id)
     image, move = image_pack[0], image_pack[1]
     data_edges = get_property(image, "xlink:href")
     before_image_slice = svg[0:data_edges[0] + move]
@@ -80,12 +75,14 @@ def build_svg(svg, picture, bid):
 
     build = before_image_slice + addon + after_image_slice
     buildname = 'build' + str(bid) + '.svg'
-    with open(config['build_place'] + '/' + buildname, "w") as file:
+    with open(directory_config['build_dir'] + '/' + buildname, "w") as file:
         file.write(build)
 
+def build_pack():
+    build_id = 0
+    for picture in pictures:
+        build_svg(data, pictures_dir + '/' + picture, build_id)
+        build_id += 1
+    print(f'Build completed, {build_id} pictures are built.')
 
-build_id = 0
-
-for picture in pictures:
-    build_svg(data, pictures_dir + '/' + picture, build_id)
-    build_id += 1
+build_pack()

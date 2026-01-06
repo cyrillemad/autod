@@ -1,8 +1,6 @@
 import base64
 import tomllib
-
-build_path = "build.svg"
-select_id = "image0_1081_1069"
+import os
 
 with open("config.toml", "rb") as cfg:
     config = tomllib.load(cfg)
@@ -10,6 +8,9 @@ with open("config.toml", "rb") as cfg:
 with open(config['template_svg'], "r") as svg:
     data = svg.read()
 
+select_id = config['change_svg_picture_id']
+pictures_dir = config['pictures_dir']
+pictures = os.listdir(pictures_dir)
 
 def decompose_image(data):
     first = -1
@@ -67,19 +68,24 @@ def select_image_by_id(pack, id):
         if get_property(element, id) != []:
             return element_pack
 
-def build_svg(svg, picture):
+def build_svg(svg, picture, bid):
 
     image_pack = select_image_by_id(decompose_image(svg), select_id)
     addon = template_to_base64(picture)
+    print(select_id)
     image, move = image_pack[0], image_pack[1]
     data_edges = get_property(image, "xlink:href")
     before_image_slice = svg[0:data_edges[0] + move]
     after_image_slice = svg[data_edges[1] - 1 + move:-1]
 
     build = before_image_slice + addon + after_image_slice
-    buildname = 'build.svg' # todo: generation of packs svg from packs input pictures
-    with open(config['build_place'] + buildname, "w") as file:
+    buildname = 'build' + str(bid) + '.svg'
+    with open(config['build_place'] + '/' + buildname, "w") as file:
         file.write(build)
 
 
-build_svg(data, config['change_picture'])
+build_id = 0
+
+for picture in pictures:
+    build_svg(data, pictures_dir + '/' + picture, build_id)
+    build_id += 1

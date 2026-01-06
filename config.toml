@@ -1,3 +1,5 @@
-build_place = "target/"
+build_place = "target"
 template_svg = "test.svg"
-change_picture = "test.png"
+change_svg_picture_id = "image0_97_20"
+pictures_dir = "template"
+
